@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.14">
+  <POU Name="FB_SaveFile" Id="{fe763fff-0e78-429a-bb37-65394dcd46af}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_SaveFile
+VAR_INPUT
+	sPath:STRING;
+	AmsNetId:STRING;
+	sBuffer:STRING;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	//Functions
+	fbFileOpen   : FB_FileOpen;
+    fbFileWrite  : FB_FileWrite;
+    fbFileClose  : FB_FileClose;
+
+	//Aux variables
+	jsonDOC : SJsonValue;
+	FileHandle :UINT;
+	nState: INT:=0;
+	
+	bOpenExec:BOOL;
+	bWriteExec:BOOL;
+	bCloseExec:BOOL;
+	
+	nErrorIdOpen:UDINT;
+	nErrorIdWrite:UDINT;
+	nErrorIdClose:UDINT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE nState OF
+	00: //Idle
+	bOpenExec:=FALSE;
+	bWriteExec:=FALSE;
+	bCloseExec:=FALSE;
+	nState:=10;
+		
+	
+	10://CreateFile
+		bOpenExec:=TRUE;
+		fbFileOpen(sNetId:=AmsNetId,sPathName := sPath,nMode := FOPEN_MODEWRITE OR FOPEN_MODETEXT,bExecute := bOpenExec);
+		FileHandle :=fbFileOpen.hFile;
+		IF NOT fbFileOpen.bError AND NOT fbFileOpen.bBusy THEN
+		nState:=20;
+		bOpenExec := FALSE;
+		END_IF
+		IF fbFileOpen.bError THEN
+		nState :=999;			
+		END_IF
+		
+	20: //Write the information
+		bWriteExec:=TRUE;
+		fbFileWrite(sNetId := '',hFile := FileHandle,pWriteBuff := ADR(sBuffer),cbWriteLen := LEN(sBuffer),bExecute := bWriteExec);
+		IF NOT fbFileWrite.bError AND NOT fbFileWrite.bBusy THEN
+		bWriteExec :=FALSE;
+		nState :=30;
+		END_IF
+		IF fbFileWrite.bError THEN
+		nState :=999;			
+		END_IF
+		
+	30: //Save the information and close the file
+		bCloseExec:=TRUE;
+		fbFileClose(sNetId:='', hFile := FileHandle, bExecute := bCloseExec);
+		IF NOT fbFileClose.bError AND NOT fbFileClose.bBusy THEN
+		FileHandle:=0;
+		bCloseExec := FALSE;
+		END_IF
+		IF fbFileClose.bError THEN
+		nState :=999;			
+		END_IF
+		
+	999: //Error State
+		nErrorIdOpen:=fbFileOpen.nErrId;
+		nErrorIdWrite:=fbFileWrite.nErrId;
+		nErrorIdClose:=fbFileClose.nErrId;	
+	END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="FB_SaveFile">
+      <LineId Id="10" Count="1" />
+      <LineId Id="139" Count="1" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="13" Count="1" />
+      <LineId Id="16" Count="9" />
+      <LineId Id="133" Count="0" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="29" Count="5" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="35" Count="3" />
+      <LineId Id="40" Count="8" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

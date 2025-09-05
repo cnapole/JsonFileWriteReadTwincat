@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.14">
+  <POU Name="MAIN" Id="{81fdac0f-1e0d-486a-ba31-7d84129b3f10}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	fbJson:FB_JsonSaxWriter;
+	fbJsonDomParser:FB_JsonDomParser;
+
+	fbSaveFile :FB_SaveFile;
+	fbReadJsonReal :FB_ReadJsonReal;
+	
+	jsonDOC : SJsonValue;
+	
+	Trigger: BOOL:=TRUE;
+	sBuffer :STRING(100);
+	r32:REAL;
+
+	bSave:BOOL;
+
+	
+	bLoadJsonFile:BOOL;
+	jSonProp :SJsonValue;
+	jsonRoot :SJsonValue;
+	fSensorValue :LREAL;
+	bReadValue:BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF Trigger THEN
+	r32:=r32+0.01;
+	IF r32>=1000.0 THEN
+		r32:=0.0;
+	END_IF
+
+	//Object creation
+	fbJson.StartObject(); //Open Bracket
+		fbJson.AddKey('Sensor1');
+		fbJson.AddReal((r32));
+	fbJson.EndObject(); //Close Bracket
+	
+	//Document creation
+	sBuffer := fbJson.GetDocument();
+	fbJson.ResetDocument();
+	
+END_IF
+
+//Save information
+IF bSave THEN
+	fbSaveFile(sPath:='C:\TwinCAT\3.1\Boot\MyData.json',AmsNetId:='',sBuffer:=sBuffer);
+	bSave:=FALSE;
+END_IF
+
+//Read information
+IF bLoadJsonFile THEN
+fbReadJsonReal(Member:='Sensor1',sPath:='C:\TwinCAT\3.1\Boot\MyData.json',fReadValue=>);
+fSensorValue:= fbReadJsonReal.fReadValue;
+END_IF
+]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="120" Count="17" />
+      <LineId Id="167" Count="1" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="242" Count="0" />
+      <LineId Id="270" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="271" Count="0" />
+      <LineId Id="273" Count="0" />
+      <LineId Id="290" Count="0" />
+      <LineId Id="296" Count="0" />
+      <LineId Id="294" Count="0" />
+      <LineId Id="283" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

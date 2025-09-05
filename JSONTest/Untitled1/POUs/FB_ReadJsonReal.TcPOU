@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.14">
+  <POU Name="FB_ReadJsonReal" Id="{4ba2a39c-a424-439c-a917-991d29f9a581}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ReadJsonReal
+VAR_INPUT
+	Member:STRING;
+	sPath:STRING;
+END_VAR
+VAR_OUTPUT
+	fReadValue:LREAL;
+END_VAR
+VAR
+	nState: INT:=0;
+	fbJsonDomParser:FB_JsonDomParser;
+	ErrorCode :HRESULT;
+	jSonProp :SJsonValue;
+	jsonRoot :SJsonValue;
+	bLoadDocument:BOOL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+CASE nState OF
+	00: //Idle
+		bLoadDocument:=FALSE;
+		nState:=10;
+		
+	10: //Load the document
+		bLoadDocument:=TRUE;
+		fbJsonDomParser.LoadDocumentFromFile(sPath,bLoadDocument, hrErrorCode =>ErrorCode);
+		IF ErrorCode = S_OK THEN
+		nState:=20;
+		END_IF
+	
+	20: //Read the desired values
+		jsonRoot :=fbJsonDomParser.GetDocumentRoot();
+		jSonProp := fbJsonDomParser.FindMember(jsonRoot,Member);
+		IF (jsonProp<>0) THEN
+			fReadValue := fbJsonDomParser.GetDouble(jSonProp);
+		ELSE 
+			fReadValue := -999999;
+		END_IF
+		
+END_CASE
+
+]]></ST>
+    </Implementation>
+    <LineIds Name="FB_ReadJsonReal">
+      <LineId Id="21" Count="0" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="33" Count="1" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="41" Count="1" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="11" Count="2" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
