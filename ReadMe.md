@@ -1,4 +1,4 @@
-# JSON file creation and variable read from JSON
+# JSON file creation and variable read from JSON in Twincat 3
 
 Goal: how to create a JSON file and read the objects afterwards
 
