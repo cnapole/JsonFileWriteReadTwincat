@@ -5,9 +5,11 @@
 VAR_INPUT
 	sPath:STRING;
 	AmsNetId:STRING;
-	sBuffer:STRING;
+	sBuffer:STRING(1024);
 END_VAR
 VAR_OUTPUT
+	ErrorSaveFile:BOOL;
+	SaveFileDone:BOOL;
 END_VAR
 VAR
 	//Functions
@@ -51,7 +53,7 @@ END_VAR]]></Declaration>
 		
 	20: //Write the information
 		bWriteExec:=TRUE;
-		fbFileWrite(sNetId := '',hFile := FileHandle,pWriteBuff := ADR(sBuffer),cbWriteLen := LEN(sBuffer),bExecute := bWriteExec);
+		fbFileWrite(sNetId := AmsNetId,hFile := FileHandle,pWriteBuff := ADR(sBuffer),cbWriteLen := LEN(sBuffer),bExecute := bWriteExec);
 		IF NOT fbFileWrite.bError AND NOT fbFileWrite.bBusy THEN
 		bWriteExec :=FALSE;
 		nState :=30;
@@ -62,39 +64,25 @@ END_VAR]]></Declaration>
 		
 	30: //Save the information and close the file
 		bCloseExec:=TRUE;
-		fbFileClose(sNetId:='', hFile := FileHandle, bExecute := bCloseExec);
+		fbFileClose(sNetId:=AmsNetId, hFile := FileHandle, bExecute := bCloseExec);
 		IF NOT fbFileClose.bError AND NOT fbFileClose.bBusy THEN
 		FileHandle:=0;
 		bCloseExec := FALSE;
+		SaveFileDone:=TRUE;
 		END_IF
 		IF fbFileClose.bError THEN
 		nState :=999;			
 		END_IF
 		
 	999: //Error State
+		ErrorSaveFile:=TRUE;
 		nErrorIdOpen:=fbFileOpen.nErrId;
 		nErrorIdWrite:=fbFileWrite.nErrId;
 		nErrorIdClose:=fbFileClose.nErrId;	
 	END_CASE]]></ST>
     </Implementation>
     <LineIds Name="FB_SaveFile">
-      <LineId Id="10" Count="1" />
-      <LineId Id="139" Count="1" />
-      <LineId Id="127" Count="0" />
-      <LineId Id="129" Count="0" />
-      <LineId Id="126" Count="0" />
-      <LineId Id="12" Count="0" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="134" Count="0" />
-      <LineId Id="13" Count="1" />
-      <LineId Id="16" Count="9" />
-      <LineId Id="133" Count="0" />
-      <LineId Id="26" Count="1" />
-      <LineId Id="128" Count="0" />
-      <LineId Id="29" Count="5" />
-      <LineId Id="132" Count="0" />
-      <LineId Id="35" Count="3" />
-      <LineId Id="40" Count="8" />
+      <LineId Id="195" Count="47" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>

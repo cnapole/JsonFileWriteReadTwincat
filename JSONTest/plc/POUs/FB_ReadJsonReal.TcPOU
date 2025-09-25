@@ -8,6 +8,7 @@ VAR_INPUT
 END_VAR
 VAR_OUTPUT
 	fReadValue:LREAL;
+	ReadDone:BOOL;
 END_VAR
 VAR
 	nState: INT:=0;
@@ -37,6 +38,7 @@ CASE nState OF
 		jSonProp := fbJsonDomParser.FindMember(jsonRoot,Member);
 		IF (jsonProp<>0) THEN
 			fReadValue := fbJsonDomParser.GetDouble(jSonProp);
+			ReadDone:=TRUE;
 		ELSE 
 			fReadValue := -999999;
 		END_IF
@@ -46,25 +48,7 @@ END_CASE
 ]]></ST>
     </Implementation>
     <LineIds Name="FB_ReadJsonReal">
-      <LineId Id="21" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="53" Count="1" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="56" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="22" Count="0" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="23" Count="0" />
-      <LineId Id="33" Count="1" />
-      <LineId Id="39" Count="0" />
-      <LineId Id="41" Count="1" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="11" Count="2" />
+      <LineId Id="98" Count="24" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>
